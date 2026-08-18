@@ -28,12 +28,15 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
+ 	   steps {
+               withSonarQubeEnv('SonarQube') {
+                   sh '''
+                       mvn sonar:sonar \
+                       -Dsonar.projectKey=jenkins-end-to-end
+                   '''
+               }
+           }
+       }
 
         stage('Docker Build') {
             steps {
