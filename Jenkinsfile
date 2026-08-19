@@ -58,6 +58,23 @@ pipeline {
                 sh 'docker push ${ECR_REPO}:${IMAGE_TAG}'
             }
         }
+       stage('Deploy to EKS') {
+    	   steps {
+               sh '''
+                   aws eks update-kubeconfig \
+                   --region ${AWS_REGION} \
+                   --name helm-cluster
+
+                   sed "s|IMAGE_PLACEHOLDER|${ECR_REPO}:${IMAGE_TAG}|g" \
+                   deployment.yaml > deployment-final.yaml
+
+                   kubectl apply -f deployment-final.yaml
+                   kubectl apply -f service.yaml
+
+                  kubectl rollout status deployment/jenkins-demo
+                 '''
+              }
+        }
     }
 
     post {
